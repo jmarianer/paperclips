@@ -1,8 +1,12 @@
 import Exts.Maybe exposing (catMaybes)
 import Html exposing (..)
 import Html.Attributes exposing (disabled)
+import Html.CssHelpers
 import Html.Events exposing (onClick)
+import Stylesheet exposing (..)
 import Time exposing (Time, second)
+
+-- MODEL
 
 type alias Model = {
   unusedClips : Int,
@@ -62,8 +66,45 @@ projects model = [
   }]
 
 
+-- VIEW
+
+{ id, class, classList } = Html.CssHelpers.withNamespace ""
+
+-- TODO Revamp showNumber
+splitThousands : String -> List String  -- Copied from https://github.com/cuducos/elm-format-number/blob/5.0.2/src/Helpers.elm
+splitThousands integers =
+  let
+    reversedSplitThousands : String -> List String
+    reversedSplitThousands value =
+      if String.length value > 3 then
+        value
+        |> String.dropRight 3
+        |> reversedSplitThousands
+        |> (::) (String.right 3 value)
+      else
+        [ value ]
+  in
+    integers
+    |> reversedSplitThousands
+    |> List.reverse
+
+
 showNumber : String -> number -> Html Msg
-showNumber icon num = text (icon ++ ":" ++ toString num)
+showNumber icon num =
+  let
+    digits = 9
+    maxNumber = 1e10 - 1  -- TODO use digits
+
+    string = String.padLeft digits '!' <| toString num
+    separatedString = string |> splitThousands |> String.join ","
+  in
+    tr [] [
+      td [] [text icon],
+      td [class [Number]] [
+        text <| separatedString,
+        span [class [Overlay]] [text "888,888,888"]
+      ]
+    ]
 
 maybeShowProject : Model -> Project -> Maybe (Html Msg)
 maybeShowProject model project =
@@ -77,14 +118,19 @@ showProjects model = catMaybes <| List.map (maybeShowProject model) (projects mo
 
 view : Model -> Html Msg
 view model = div [] ([
-  showNumber "Inventory" model.unusedClips,
-  showNumber "Total manufactured paperclips" model.totalManufactured,
-  showNumber "Wire" model.wireInches,
-  showNumber "Money" model.funds
+  node "style" [] [text cssString],
+  table [] [
+    showNumber "Inventory" model.unusedClips,
+    showNumber "Total manufactured paperclips" model.totalManufactured,
+    showNumber "Wire" model.wireInches,
+    showNumber "Money" model.funds
+  ]
   ] ++ showProjects model)
 
-type Msg = RunProject Project | Tick Time
 
+-- UPDATE and MAIN
+
+type Msg = RunProject Project | Tick Time
 update : Msg -> Model -> (Model, Cmd msg)
 update msg model =
   case msg of
