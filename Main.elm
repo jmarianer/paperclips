@@ -23,7 +23,7 @@ model = {
   unusedClips = 0,
   wireInches = 1000,
   totalManufactured = 0,
-  funds = 999999990,
+  funds = 0,
   priceCents = 25,
   wirePrice = 10,
   previousTotalClips = 0
@@ -71,47 +71,52 @@ projects model = [
 
 -- VIEW
 
-{ id, class, classList } = Html.CssHelpers.withNamespace ""
+class a = (.class <| Html.CssHelpers.withNamespace "") [a]
 
 icon iconName desc = img [src <| "icons/" ++ iconName ++ ".svg", alt desc] []
 
-thousands : Int -> String
-thousands i =
-  let
-    splitThousands i =
-      if i == 0
-      then ""
-      else
-        if i >= 1000
-        then splitThousands (i//1000) ++ "," ++ (String.padLeft 3 '0' <| toString <| rem i 1000)
-        else toString i
-  in
-    if i == 0
-    then "0"
-    else splitThousands i
 
-showNumber : String -> String -> Int -> Html Msg
-showNumber iconName desc num =
+showNumber : Int -> String -> String -> Int -> Html Msg
+showNumber digits iconName desc num =
   let
-    digits = 9
     maxDisplay = 10^digits - 1
     eights = maxDisplay // 9 * 8
+
+    splitThousands_ : Int -> List (Html Msg)
+    splitThousands_ i =
+      if i == 0
+      then []
+      else
+        if i >= 1000
+        then splitThousands_ (i//1000) ++ [span [class Comma] [text ","], text <| String.padLeft 3 '0' <| toString <| rem i 1000]
+        else [text <| toString i]
+
+    splitThousands : Int -> List (Html Msg)
+    splitThousands i =
+      if i == 0
+      then [text "0"]
+      else splitThousands_ i
+    
   in
     tr [] [
       td [] [icon iconName desc],
-      td [class [Number]] [
-        text <| thousands eights,
-        span [class [Overlay]] [text <| thousands <| min num maxDisplay]
-      ]
+      td [class Number] (
+        splitThousands eights
+        ++ [span [class Overlay] <| splitThousands <| min num maxDisplay]
+      )
     ]
 
 maybeShowProject : Model -> Project -> Maybe (Html Msg)
 maybeShowProject model project =
   case project.visible of
     True ->
-      Just <| button [class [Stylesheet.Project], onClick <| RunProject project, disabled <| not project.enabled] [
+      Just <| button [class Stylesheet.Project, onClick <| RunProject project, disabled <| not project.enabled] [
         icon project.icon "",
-        text project.title
+        text project.title,
+        br [] [],
+        text project.priceTag,
+        br [] [],
+        text project.shortDesc
       ]
     False -> Nothing
 
@@ -124,13 +129,13 @@ view model =
     node "style" [] [text cssString],
     div [] [
       table [] [
-        showNumber "paperclip" "Inventory" model.unusedClips,
-        showNumber "paperclip" "Total manufactured paperclips" model.totalManufactured,
-        showNumber "wirespool" "Wire" model.wireInches,
-        showNumber "paperclip" "Money" model.funds
+        showNumber 9 "paperclip" "Inventory" model.unusedClips,
+        showNumber 9 "paperclip" "Total manufactured paperclips" model.totalManufactured,
+        showNumber 9 "wirespool" "Wire" model.wireInches,
+        showNumber 9 "paperclip" "Money" model.funds
       ]
     ],
-    div [class [Projects]] (showProjects model)
+    div [class Projects] (showProjects model)
   ]
 
 

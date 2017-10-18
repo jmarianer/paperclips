@@ -3,7 +3,7 @@ module Stylesheet exposing (CssClasses(..), cssString)
 import Css exposing (..)
 import Css.Elements exposing (..)
 
-type CssClasses = Number | Overlay | Projects | Project
+type CssClasses = Number | Overlay | Projects | Project | Comma
 css =
   stylesheet [
     body [
@@ -17,9 +17,9 @@ css =
       borderSpacing (px 15)
     ],
     class Number [
-      fontFamilies [qt "DSEG7 Classic Mini", qt "Courier New"],
+      fontFamilies [qt "DSEG7 Classic Mini"],
       position relative,
-      color <| rgba 0 255 0 0.43,
+      color <| rgba 0 255 0 0.15,
       backgroundColor <| hex "000",
       border3 (px 1) solid <| hex "979797",
       padding (px 5),
@@ -33,6 +33,11 @@ css =
           width (pct 100)
         ]
       ]
+    ],
+    class Comma [
+      fontFamilies [qt "DSEG14 Classic Mini"],
+      marginRight (px -20),
+      marginLeft (px -10)
     ],
     class Project [
       width (px 128),
