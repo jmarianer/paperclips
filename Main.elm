@@ -23,7 +23,7 @@ model = {
   unusedClips = 0,
   wireInches = 1000,
   totalManufactured = 0,
-  funds = 0,
+  funds = 999999990,
   priceCents = 25,
   wirePrice = 10,
   previousTotalClips = 0
@@ -56,7 +56,7 @@ projects model = [
     priceTag = "1\" of wire",
     shortDesc = "",
     visible = True,
-    enabled = model.wireInches > 1,
+    enabled = model.wireInches >= 1,
     effect = createClips model 1
   }, {
     title = "Wire",
@@ -64,7 +64,7 @@ projects model = [
     priceTag = "$" ++ toString model.wirePrice,
     shortDesc = "1000\"",
     visible = True,
-    enabled = model.funds > model.wirePrice,
+    enabled = model.funds >= model.wirePrice,
     effect = { model | funds = model.funds - model.wirePrice, wireInches = model.wireInches + 1000 }
   }]
 
@@ -73,40 +73,35 @@ projects model = [
 
 { id, class, classList } = Html.CssHelpers.withNamespace ""
 
--- TODO Revamp showNumber
-splitThousands : String -> List String  -- Copied from https://github.com/cuducos/elm-format-number/blob/5.0.2/src/Helpers.elm
-splitThousands integers =
-  let
-    reversedSplitThousands : String -> List String
-    reversedSplitThousands value =
-      if String.length value > 3 then
-        value
-        |> String.dropRight 3
-        |> reversedSplitThousands
-        |> (::) (String.right 3 value)
-      else
-        [ value ]
-  in
-    integers
-    |> reversedSplitThousands
-    |> List.reverse
-
 icon iconName desc = img [src <| "icons/" ++ iconName ++ ".svg", alt desc] []
 
-showNumber : String -> String -> number -> Html Msg
+thousands : Int -> String
+thousands i =
+  let
+    splitThousands i =
+      if i == 0
+      then ""
+      else
+        if i >= 1000
+        then splitThousands (i//1000) ++ "," ++ (String.padLeft 3 '0' <| toString <| rem i 1000)
+        else toString i
+  in
+    if i == 0
+    then "0"
+    else splitThousands i
+
+showNumber : String -> String -> Int -> Html Msg
 showNumber iconName desc num =
   let
     digits = 9
-    maxNumber = 1e10 - 1  -- TODO use digits
-
-    string = String.padLeft digits '!' <| toString num
-    separatedString = string |> splitThousands |> String.join ","
+    maxDisplay = 10^digits - 1
+    eights = maxDisplay // 9 * 8
   in
     tr [] [
       td [] [icon iconName desc],
       td [class [Number]] [
-        text <| separatedString,
-        span [class [Overlay]] [text "888,888,888"]
+        text <| thousands eights,
+        span [class [Overlay]] [text <| thousands <| min num maxDisplay]
       ]
     ]
 

@@ -17,9 +17,9 @@ css =
       borderSpacing (px 15)
     ],
     class Number [
-      fontFamilies [qt "DSEG7 Classic", qt "Courier New"],
+      fontFamilies [qt "DSEG7 Classic Mini", qt "Courier New"],
       position relative,
-      color <| hex "0F0",
+      color <| rgba 0 255 0 0.43,
       backgroundColor <| hex "000",
       border3 (px 1) solid <| hex "979797",
       padding (px 5),
@@ -27,8 +27,10 @@ css =
       children [
         class Overlay [
           position absolute,
-          left (px 5),
-          color <| rgba 0 255 0 0.43
+          left (px -5),
+          color <| rgba 0 255 0 1,
+          textAlign right,
+          width (pct 100)
         ]
       ]
     ],
