@@ -1,6 +1,6 @@
 import Exts.Maybe exposing (catMaybes)
 import Html exposing (..)
-import Html.Attributes exposing (disabled)
+import Html.Attributes exposing (alt, disabled, src)
 import Html.CssHelpers
 import Html.Events exposing (onClick)
 import Stylesheet exposing (..)
@@ -31,6 +31,7 @@ model = {
 
 type alias Project = {
   title : String,
+  icon : String,
   priceTag : String,
   shortDesc : String,
   --longDesc : String,
@@ -51,6 +52,7 @@ projects : Model -> List Project
 projects model = [
   {
     title = "Make paperclip",
+    icon = "paperclip",
     priceTag = "1\" of wire",
     shortDesc = "",
     visible = True,
@@ -58,6 +60,7 @@ projects model = [
     effect = createClips model 1
   }, {
     title = "Wire",
+    icon = "wirespool",
     priceTag = "$" ++ toString model.wirePrice,
     shortDesc = "1000\"",
     visible = True,
@@ -88,9 +91,10 @@ splitThousands integers =
     |> reversedSplitThousands
     |> List.reverse
 
+icon iconName desc = img [src <| "icons/" ++ iconName ++ ".svg", alt desc] []
 
-showNumber : String -> number -> Html Msg
-showNumber icon num =
+showNumber : String -> String -> number -> Html Msg
+showNumber iconName desc num =
   let
     digits = 9
     maxNumber = 1e10 - 1  -- TODO use digits
@@ -99,7 +103,7 @@ showNumber icon num =
     separatedString = string |> splitThousands |> String.join ","
   in
     tr [] [
-      td [] [text icon],
+      td [] [icon iconName desc],
       td [class [Number]] [
         text <| separatedString,
         span [class [Overlay]] [text "888,888,888"]
@@ -110,22 +114,29 @@ maybeShowProject : Model -> Project -> Maybe (Html Msg)
 maybeShowProject model project =
   case project.visible of
     True ->
-      Just <| button [onClick <| RunProject project, disabled <| not project.enabled] [text project.title]
+      Just <| button [class [Stylesheet.Project], onClick <| RunProject project, disabled <| not project.enabled] [
+        icon project.icon "",
+        text project.title
+      ]
     False -> Nothing
 
 showProjects : Model -> List (Html Msg)
 showProjects model = catMaybes <| List.map (maybeShowProject model) (projects model)
 
 view : Model -> Html Msg
-view model = div [] ([
-  node "style" [] [text cssString],
-  table [] [
-    showNumber "Inventory" model.unusedClips,
-    showNumber "Total manufactured paperclips" model.totalManufactured,
-    showNumber "Wire" model.wireInches,
-    showNumber "Money" model.funds
+view model =
+  div [] [
+    node "style" [] [text cssString],
+    div [] [
+      table [] [
+        showNumber "paperclip" "Inventory" model.unusedClips,
+        showNumber "paperclip" "Total manufactured paperclips" model.totalManufactured,
+        showNumber "wirespool" "Wire" model.wireInches,
+        showNumber "paperclip" "Money" model.funds
+      ]
+    ],
+    div [class [Projects]] (showProjects model)
   ]
-  ] ++ showProjects model)
 
 
 -- UPDATE and MAIN
