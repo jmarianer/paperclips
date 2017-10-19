@@ -9,7 +9,8 @@ type alias Model = {
   wirePrice : Int,
   previousTotalClips : Int,
   autoClippersEnabled : Bool,
-  autoClipperCount : Int
+  autoClipperCount : Int,
+  marketingLevel : Int
   }
 
 initialModel : Model
@@ -22,23 +23,27 @@ initialModel = {
   wirePrice = 10,
   previousTotalClips = 0,
   autoClippersEnabled = False,
-  autoClipperCount = 0
+  autoClipperCount = 0,
+  marketingLevel = 0
   }
 
 createClips : Model -> Int -> Model
 createClips m i =
-  { m |
-    unusedClips = m.unusedClips + i,
-    totalManufactured = m.totalManufactured + i,
-    wireInches = m.wireInches - i
-  }
+  let
+    clipCount = min i m.wireInches
+  in
+    { m |
+      unusedClips = m.unusedClips + clipCount,
+      totalManufactured = m.totalManufactured + clipCount,
+      wireInches = m.wireInches - clipCount
+    }
 
 demand m =
   let
     marketingLvl = 0
-    marketing = 1.1^marketingLvl
+    marketing = 1.1 ^ (toFloat m.marketingLevel)
   in
-    800 / (toFloat m.priceCents) * marketing --* marketingEffectiveness
+    800 / (toFloat m.priceCents) * marketing
 
 sellClips : Model -> Model
 sellClips m =

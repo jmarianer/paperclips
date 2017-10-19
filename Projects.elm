@@ -39,5 +39,13 @@ projects model = [
     visible = model.autoClippersEnabled,
     enabled = model.funds >= Model.autoClipperPrice model,
     effect = { model | funds = model.funds - Model.autoClipperPrice model, autoClipperCount = model.autoClipperCount + 1 }
+  }, {
+    title = "Buy ad",
+    icon = "wirespool",
+    priceTag = "$" ++ (toString <| (2 ^ model.marketingLevel) * 100),
+    shortDesc = "Increases marketing effectiveness",
+    visible = True,
+    enabled = model.funds >= (2 ^ model.marketingLevel) * 10000,
+    effect = { model | funds = model.funds - ((2 ^ model.marketingLevel) * 10000), marketingLevel = model.marketingLevel + 1 }
   }]
 
