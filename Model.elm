@@ -10,8 +10,15 @@ type alias Model = {
   previousTotalClips : Int,
   autoClippersEnabled : Bool,
   autoClipperCount : Int,
+  autoClipperRate : Int,
   marketingLevel : Int,
-  partialClips  : Int
+  partialClips  : Int,
+  computationEnabled : Bool,
+  processors : Int,
+  memory : Int,
+  milliOps : Int,
+  creativityEnabled : Bool,
+  creativity : Int
   }
 
 initialModel : Model
@@ -19,14 +26,21 @@ initialModel = {
   unusedClips = 0,
   wireInches = 1000,
   totalManufactured = 0,
-  funds = 1000,
+  funds = 0,
   priceCents = 25,
   wirePrice = 10,
   previousTotalClips = 0,
   autoClippersEnabled = False,
   autoClipperCount = 0,
+  autoClipperRate = 1000,
   marketingLevel = 0,
-  partialClips = 0
+  partialClips = 0,
+  computationEnabled = False,
+  processors = 1,
+  memory = 1,
+  milliOps = 0,
+  creativityEnabled = False,
+  creativity = 0
   }
 
 createClips : Model -> Int -> Model
@@ -37,7 +51,8 @@ createClips m i =
     { m |
       unusedClips = m.unusedClips + clipCount,
       totalManufactured = m.totalManufactured + clipCount,
-      wireInches = m.wireInches - clipCount
+      wireInches = m.wireInches - clipCount,
+      computationEnabled = m.computationEnabled || m.totalManufactured + clipCount >= 2000
     }
 
 createPartialClips : Model -> Int -> Model

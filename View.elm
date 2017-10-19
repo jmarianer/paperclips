@@ -77,20 +77,20 @@ showProjects model = catMaybes <| List.map (maybeShowProject model) (projects mo
 view : Model -> Html Msg
 view model =
   let
-    row decimals iconName desc num =
+    row digits decimals iconName desc num =
       tr [] [
         td [] [icon iconName desc],
-        td [] [showNumber 9 decimals  num]
+        td [] [showNumber digits decimals  num]
       ]
   in
-  div [] [
-    node "style" [] [text cssString],
-    div [] [
+  div [] <| catMaybes [
+    Just <| node "style" [] [text cssString],
+    Just <| div [] [
       table [] <| catMaybes [
-        Just <| row 0 "paperclip" "Inventory" model.unusedClips,
-        Just <| row 0 "paperclip" "Total manufactured paperclips" model.totalManufactured,
-        Just <| row 0 "wirespool" "Available wire" model.wireInches,
-        Just <| row 2 "paperclip" "Available funds" model.funds,
+        Just <| row 9 0 "paperclip" "Inventory" model.unusedClips,
+        Just <| row 9 0 "paperclip" "Total manufactured paperclips" model.totalManufactured,
+        Just <| row 9 0 "wirespool" "Available wire" model.wireInches,
+        Just <| row 9 2 "paperclip" "Available funds" model.funds,
         Just <| tr [] [
           td [] [icon "paperclip" "Price per clip"],
           td [class Thing] [
@@ -100,11 +100,19 @@ view model =
           ]
         ],
         if model.autoClipperCount > 0
-        then Just <| row 0 "paperclip" "AutoClippers" model.autoClipperCount
+        then Just <| row 9 0 "paperclip" "AutoClippers" model.autoClipperCount
+        else Nothing,
+        if model.computationEnabled
+        then Just <| row 9 0 "paperclip" "Total processors" model.processors
+        else Nothing,
+        if model.computationEnabled
+        then Just <| row 9 0 "paperclip" "Total memory" model.memory
+        else Nothing,
+        if model.computationEnabled
+        then Just <| row 9 0 "paperclip" "Stored operations" <| model.milliOps // 1000
         else Nothing
       ]
     ],
-    text <| "Demand: " ++ (toString <| round <| Model.demand model),
-    div [class Projects] (showProjects model)
+    Just <| div [class Projects] (showProjects model)
   ]
 
