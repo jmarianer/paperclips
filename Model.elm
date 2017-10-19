@@ -1,4 +1,4 @@
-module Model exposing (Model, initialModel, createClips)
+module Model exposing (Model, initialModel, createClips, sellClips, demand)
 
 type alias Model = {
   unusedClips : Int,
@@ -29,3 +29,26 @@ createClips m i =
     wireInches = m.wireInches - i
   }
 
+demand m =
+  let
+    marketingLvl = 0
+    marketing = 1.1^marketingLvl
+  in
+    800 / (toFloat m.priceCents) * marketing --* marketingEffectiveness
+
+sellClips : Model -> Model
+sellClips m =
+  let
+    clipsToSell = floor (0.7 * (demand m)^1.15)
+  in
+    if m.unusedClips > clipsToSell
+    then
+      { m |
+        unusedClips = m.unusedClips - clipsToSell,
+        funds = m.funds + m.priceCents * clipsToSell
+      }
+    else
+      { m |
+        unusedClips = 0,
+        funds = m.funds + m.priceCents * m.unusedClips
+      }

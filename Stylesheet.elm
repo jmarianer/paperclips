@@ -3,7 +3,7 @@ module Stylesheet exposing (CssClasses(..), cssString)
 import Css exposing (..)
 import Css.Elements exposing (..)
 
-type CssClasses = Number | Overlay | Projects | Project | Comma
+type CssClasses = Number | Overlay | Projects | Project | Comma | Button | Disabled
 css =
   stylesheet [
     body [
@@ -21,15 +21,15 @@ css =
       position relative,
       color <| rgba 0 255 0 0.15,
       backgroundColor <| hex "000",
-      border3 (px 1) solid <| hex "979797",
+      border3 (px 1) inset <| hex "979797",
       padding (px 5),
       fontSize (pt 36),
+      textAlign right,
       children [
         class Overlay [
           position absolute,
           left (px -5),
           color <| rgba 0 255 0 1,
-          textAlign right,
           width (pct 100)
         ]
       ]
@@ -45,7 +45,8 @@ css =
       displayFlex,
       flexDirection column,
       justifyContent (\a -> property "space-evenly" a.value),
-      alignItems center
+      alignItems center,
+      margin (px 15)
     ],
     class Projects [
       displayFlex,
@@ -54,6 +55,19 @@ css =
     div [
       displayFlex,
       flexDirection row
+    ],
+    class Button [
+      border3 (px 1) outset <| hex "979797",
+      backgroundColor <| rgba 0 0 0 0.05,
+      active [
+        border3 (px 1) inset <| hex "979797"
+      ]
+    ],
+    class Disabled [
+      active [
+        border3 (px 1) outset <| hex "979797"
+      ],
+      color <| hex "#4c4c4c"
     ]
   ]
 

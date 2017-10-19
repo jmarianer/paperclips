@@ -29,7 +29,7 @@ projects model = [
     priceTag = "$" ++ toString model.wirePrice,
     shortDesc = "1000\"",
     visible = True,
-    enabled = model.funds >= model.wirePrice,
-    effect = { model | funds = model.funds - model.wirePrice, wireInches = model.wireInches + 1000 }
+    enabled = model.funds >= model.wirePrice * 100,
+    effect = { model | funds = model.funds - model.wirePrice * 100, wireInches = model.wireInches + 1000 }
   }]
 
