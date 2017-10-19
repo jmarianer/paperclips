@@ -86,18 +86,20 @@ view model =
   div [] [
     node "style" [] [text cssString],
     div [] [
-      table [] [
-        row 0 "paperclip" "Inventory" model.unusedClips,
-        row 0 "paperclip" "Total manufactured paperclips" model.totalManufactured,
-        row 0 "wirespool" "Available wire" model.wireInches,
-        row 2 "paperclip" "Available funds" model.funds,
-        tr [] [
+      table [] <| catMaybes [
+        Just <| row 0 "paperclip" "Inventory" model.unusedClips,
+        Just <| row 0 "paperclip" "Total manufactured paperclips" model.totalManufactured,
+        Just <| row 0 "wirespool" "Available wire" model.wireInches,
+        Just <| row 2 "paperclip" "Available funds" model.funds,
+        Just <| tr [] [
           td [] [icon "paperclip" "Price per clip"],
           td [Html.Attributes.style [("text-align", "right")]] [iconButton "paperclip" "Decrease price" <| IncreasePrice -1],
           td [] [showNumber 3 2 model.priceCents],
           td [] [iconButton "paperclip" "Increase price" <| IncreasePrice 1]
         ],
-        row 0 "paperclip" "AutoClippers" model.autoClipperCount
+        if model.autoClipperCount > 0
+        then Just <| row 0 "paperclip" "AutoClippers" model.autoClipperCount
+        else Nothing
       ]
     ],
     text <| "Demand: " ++ (toString <| round <| Model.demand model),

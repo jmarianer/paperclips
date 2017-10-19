@@ -9,9 +9,9 @@ update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
   case msg of
     RunProject p -> if p.enabled then (p.effect, Cmd.none) else (model, Cmd.none)
-    MediumTick _ -> (model, Random.generate MaybeSell (Random.int 1 1000))
-    SmallTick _ -> (model, Cmd.none)
-    LargeTick _ -> (Model.createClips model model.autoClipperCount, Cmd.none)
+    SmallTick _ -> (Model.createPartialClips model (model.autoClipperCount * 10), Random.generate MaybeSell (Random.int 1 10000))
+    MediumTick _ -> (model, Cmd.none)
+    LargeTick _ -> (model, Cmd.none)
     IncreasePrice i ->
       if model.priceCents + i > 0
       then ({ model | priceCents = model.priceCents + i }, Cmd.none) 

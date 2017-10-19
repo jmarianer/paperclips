@@ -10,7 +10,8 @@ type alias Model = {
   previousTotalClips : Int,
   autoClippersEnabled : Bool,
   autoClipperCount : Int,
-  marketingLevel : Int
+  marketingLevel : Int,
+  partialClips  : Int
   }
 
 initialModel : Model
@@ -24,7 +25,8 @@ initialModel = {
   previousTotalClips = 0,
   autoClippersEnabled = False,
   autoClipperCount = 0,
-  marketingLevel = 0
+  marketingLevel = 0,
+  partialClips = 0
   }
 
 createClips : Model -> Int -> Model
@@ -37,6 +39,14 @@ createClips m i =
       totalManufactured = m.totalManufactured + clipCount,
       wireInches = m.wireInches - clipCount
     }
+
+createPartialClips : Model -> Int -> Model
+createPartialClips m i =
+  let
+    newPartialClips = m.partialClips + i
+    clipsCreated = createClips m (newPartialClips // 1000)
+  in
+    { clipsCreated | partialClips = (rem newPartialClips 1000) }
 
 demand m =
   let
