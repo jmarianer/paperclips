@@ -80,7 +80,7 @@ view model =
     row decimals iconName desc num =
       tr [] [
         td [] [icon iconName desc],
-        td [colspan 3] [showNumber 9 decimals  num]
+        td [] [showNumber 9 decimals  num]
       ]
   in
   div [] [
@@ -93,9 +93,11 @@ view model =
         Just <| row 2 "paperclip" "Available funds" model.funds,
         Just <| tr [] [
           td [] [icon "paperclip" "Price per clip"],
-          td [Html.Attributes.style [("text-align", "right")]] [iconButton "paperclip" "Decrease price" <| IncreasePrice -1],
-          td [] [showNumber 3 2 model.priceCents],
-          td [] [iconButton "paperclip" "Increase price" <| IncreasePrice 1]
+          td [class Thing] [
+            iconButton "paperclip" "Decrease price" <| IncreasePrice -1,
+            showNumber 3 2 model.priceCents,
+            iconButton "paperclip" "Increase price" <| IncreasePrice 1
+          ]
         ],
         if model.autoClipperCount > 0
         then Just <| row 0 "paperclip" "AutoClippers" model.autoClipperCount

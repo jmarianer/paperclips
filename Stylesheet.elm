@@ -3,7 +3,7 @@ module Stylesheet exposing (CssClasses(..), cssString)
 import Css exposing (..)
 import Css.Elements exposing (..)
 
-type CssClasses = Number | Overlay | Projects | Project | Comma | Button | Disabled
+type CssClasses = Number | Overlay | Projects | Project | Comma | Button | Disabled | Thing
 css =
   stylesheet [
     body [
@@ -11,7 +11,14 @@ css =
       margin (px 10)
     ],
     img [
-      width (pt 36)
+      width (pt 36),
+      height (pt 36),
+      margin (px 5)
+    ],
+    class Thing [
+      displayFlex,
+      alignItems center,
+      justifyContent center
     ],
     Css.Elements.table [
       borderSpacing (px 15)
