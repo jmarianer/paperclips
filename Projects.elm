@@ -31,5 +31,13 @@ projects model = [
     visible = True,
     enabled = model.funds >= model.wirePrice * 100,
     effect = { model | funds = model.funds - model.wirePrice * 100, wireInches = model.wireInches + 1000 }
+  }, {
+    title = "AutoClippers",
+    icon = "wirespool",
+    priceTag = toString <| Model.autoClipperPrice model,
+    shortDesc = "Creates one paperclip per second",
+    visible = model.autoClippersEnabled,
+    enabled = model.funds >= Model.autoClipperPrice model,
+    effect = { model | funds = model.funds - Model.autoClipperPrice model, autoClipperCount = model.autoClipperCount + 1 }
   }]
 

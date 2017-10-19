@@ -12,7 +12,7 @@ import Stylesheet exposing (..)
 
 -- TODO move these elsewhere
 import Time exposing (Time)
-type Msg = RunProject Project | Tick Time | IncreasePrice Int | MaybeSell Int
+type Msg = RunProject Project | LargeTick Time | MediumTick Time | SmallTick Time | IncreasePrice Int | MaybeSell Int
 
 classes = .class <| Html.CssHelpers.withNamespace ""
 class a = classes [a]
@@ -96,7 +96,8 @@ view model =
           td [Html.Attributes.style [("text-align", "right")]] [iconButton "paperclip" "Decrease price" <| IncreasePrice -1],
           td [] [showNumber 3 2 model.priceCents],
           td [] [iconButton "paperclip" "Increase price" <| IncreasePrice 1]
-        ]
+        ],
+        row 0 "paperclip" "AutoClippers" model.autoClipperCount
       ]
     ],
     text <| "Demand: " ++ (toString <| round <| Model.demand model),

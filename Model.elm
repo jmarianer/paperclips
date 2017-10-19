@@ -1,4 +1,4 @@
-module Model exposing (Model, initialModel, createClips, sellClips, demand)
+module Model exposing (..)--(Model, initialModel, createClips, sellClips, demand)
 
 type alias Model = {
   unusedClips : Int,
@@ -7,7 +7,9 @@ type alias Model = {
   funds : Int,
   priceCents : Int,
   wirePrice : Int,
-  previousTotalClips : Int
+  previousTotalClips : Int,
+  autoClippersEnabled : Bool,
+  autoClipperCount : Int
   }
 
 initialModel : Model
@@ -15,10 +17,12 @@ initialModel = {
   unusedClips = 0,
   wireInches = 1000,
   totalManufactured = 0,
-  funds = 0,
+  funds = 1000,
   priceCents = 25,
   wirePrice = 10,
-  previousTotalClips = 0
+  previousTotalClips = 0,
+  autoClippersEnabled = False,
+  autoClipperCount = 0
   }
 
 createClips : Model -> Int -> Model
@@ -39,16 +43,16 @@ demand m =
 sellClips : Model -> Model
 sellClips m =
   let
-    clipsToSell = floor (0.7 * (demand m)^1.15)
+    clipsToSell = min m.unusedClips (floor (7 * (demand m / 100) ^ 1.15))
+    newFunds = m.funds + m.priceCents * clipsToSell
   in
-    if m.unusedClips > clipsToSell
-    then
-      { m |
-        unusedClips = m.unusedClips - clipsToSell,
-        funds = m.funds + m.priceCents * clipsToSell
-      }
-    else
-      { m |
-        unusedClips = 0,
-        funds = m.funds + m.priceCents * m.unusedClips
-      }
+    { m |
+      unusedClips = m.unusedClips - clipsToSell,
+      funds = newFunds,
+      autoClippersEnabled = m.autoClippersEnabled || newFunds >= 500
+    }
+
+autoClipperPrice m =
+  case m.autoClipperCount of
+    0 -> 500
+    _ -> round (1.1 ^ (toFloat m.autoClipperCount) * 100) + 500
