@@ -19,7 +19,7 @@ projects : Model -> List Project
 projects model = [
   {
     title = "Cheat money",
-    icon = "paperclip",
+    icon = "cheat",
     priceTag = "$100",
     shortDesc = "",
     visible = cheatsOn,
@@ -27,7 +27,7 @@ projects model = [
     effect = { model | funds = model.funds + 10000 }
   }, {
     title = "Cheat paperclips",
-    icon = "paperclip",
+    icon = "cheat",
     priceTag = "1000 clips for free",
     shortDesc = "",
     visible = cheatsOn,
@@ -51,7 +51,7 @@ projects model = [
     effect = { model | funds = model.funds - model.wirePrice * 100, wireInches = model.wireInches + 1000 }
   }, {
     title = "AutoClippers",
-    icon = "wirespool",
+    icon = "autoclippers",
     priceTag = toString <| Model.autoClipperPrice model,
     shortDesc =
       if model.autoClipperRate == 1000

@@ -88,19 +88,19 @@ view model =
     Just <| div [] [
       table [] <| catMaybes [
         Just <| row 9 0 "paperclip" "Inventory" model.unusedClips,
-        Just <| row 9 0 "paperclip" "Total manufactured paperclips" model.totalManufactured,
+        Just <| row 9 0 "profit-graph" "Total manufactured paperclips" model.totalManufactured,
         Just <| row 9 0 "wirespool" "Available wire" model.wireInches,
-        Just <| row 9 2 "paperclip" "Available funds" model.funds,
+        Just <| row 9 2 "dollar" "Available funds" model.funds,
         Just <| tr [] [
           td [] [icon "paperclip" "Price per clip"],
           td [class Thing] [
-            iconButton "paperclip" "Decrease price" <| IncreasePrice -1,
+            iconButton "minus" "Decrease price" <| IncreasePrice -1,
             showNumber 3 2 model.priceCents,
-            iconButton "paperclip" "Increase price" <| IncreasePrice 1
+            iconButton "plus" "Increase price" <| IncreasePrice 1
           ]
         ],
         if model.autoClipperCount > 0
-        then Just <| row 9 0 "paperclip" "AutoClippers" model.autoClipperCount
+        then Just <| row 9 0 "autoclippers" "AutoClippers" model.autoClipperCount
         else Nothing,
         if model.computationEnabled
         then Just <| row 9 0 "paperclip" "Total processors" model.processors
