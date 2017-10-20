@@ -19,6 +19,26 @@ class a = classes [a]
 icon iconName desc = img [src <| "icons/" ++ iconName ++ ".svg", alt desc, title desc] []
 iconButton iconName desc msg = img [src <| "icons/" ++ iconName ++ ".svg", alt desc, title desc, onClick msg, class Button] []
 
+maybeShowProject : Model -> Project -> Maybe (Html Msg)
+maybeShowProject model project =
+  let
+    maybeDisabled = if project.enabled then [] else [Disabled]
+  in
+    case project.visible of
+      True ->
+        Just <| div [classes <| [Stylesheet.Project, Stylesheet.Button] ++ maybeDisabled, onClick <| RunProject project] [
+          icon project.icon "",
+          text project.title,
+          br [] [],
+          text project.priceTag,
+          br [] [],
+          text project.shortDesc
+        ]
+      False -> Nothing
+
+showProjects : Model -> List (Html Msg)
+showProjects model = catMaybes <| List.map (maybeShowProject model) (projects model)
+
 showNumber : Int -> Int -> Int -> Html Msg
 showNumber digits decimals num =
   let
@@ -54,65 +74,75 @@ showNumber digits decimals num =
       ++ [span [class Overlay] <| splitThousandsAndAddDecimal <| min num maxDisplay]
     )
 
-maybeShowProject : Model -> Project -> Maybe (Html Msg)
-maybeShowProject model project =
+viewItems model =
   let
-    maybeDisabled = if project.enabled then [] else [Disabled]
+    default num = showNumber 9 0 num
   in
-    case project.visible of
-      True ->
-        Just <| div [classes <| [Stylesheet.Project, Stylesheet.Button] ++ maybeDisabled, onClick <| RunProject project] [
-          icon project.icon "",
-          text project.title,
-          br [] [],
-          text project.priceTag,
-          br [] [],
-          text project.shortDesc
-        ]
-      False -> Nothing
-
-showProjects : Model -> List (Html Msg)
-showProjects model = catMaybes <| List.map (maybeShowProject model) (projects model)
+    [{
+      icon = "paperclip",
+      description = "Inventory",
+      trigger = True,
+      show = default model.unusedClips
+    }, {
+      icon = "profit-graph",
+      description = "Total manufactured paperclips",
+      trigger = True,
+      show = default model.totalManufactured
+    }, {
+      icon = "wirespool",
+      description = "Available wire",
+      trigger = True,
+      show = default model.wireInches
+    }, {
+      icon = "dollar",
+      description = "Available funds",
+      trigger = True,
+      show = showNumber 9 2 model.funds
+    }, {
+      icon = "paperclip",
+      description = "Price per clip",
+      trigger = True,
+      show = div [class Thing] [
+        iconButton "minus" "Decrease price" <| IncreasePrice -1,
+        showNumber 3 2 model.priceCents,
+        iconButton "plus" "Increase price" <| IncreasePrice 1
+      ]
+    }, {
+      icon = "autoclippers",
+      description = "AutoClippers",
+      trigger = model.autoClipperCount > 0,
+      show = default model.autoClipperCount
+    }, {
+      icon = "paperclip",
+      description = "Total processors",
+      trigger = model.computationEnabled,
+      show = default model.processors
+    }, {
+      icon = "paperclip",
+      description = "Total memory",
+      trigger = model.computationEnabled,
+      show = default model.memory
+    }, {
+      icon = "paperclip",
+      description = "Stored operations",
+      trigger = model.computationEnabled,
+      show = default <| model.milliOps // 1000
+    }]
 
 view : Model -> Html Msg
 view model =
   let
-    row digits decimals iconName desc num =
-      tr [] [
-        td [] [icon iconName desc],
-        td [] [showNumber digits decimals  num]
+    toRow viewItem =
+      if viewItem.trigger
+      then Just <| tr [] [
+        td [] [icon viewItem.icon viewItem.description],
+        td [] [viewItem.show]
       ]
+      else Nothing
   in
-  div [] <| catMaybes [
-    Just <| node "style" [] [text cssString],
-    Just <| div [] [
-      table [] <| catMaybes [
-        Just <| row 9 0 "paperclip" "Inventory" model.unusedClips,
-        Just <| row 9 0 "profit-graph" "Total manufactured paperclips" model.totalManufactured,
-        Just <| row 9 0 "wirespool" "Available wire" model.wireInches,
-        Just <| row 9 2 "dollar" "Available funds" model.funds,
-        Just <| tr [] [
-          td [] [icon "paperclip" "Price per clip"],
-          td [class Thing] [
-            iconButton "minus" "Decrease price" <| IncreasePrice -1,
-            showNumber 3 2 model.priceCents,
-            iconButton "plus" "Increase price" <| IncreasePrice 1
-          ]
-        ],
-        if model.autoClipperCount > 0
-        then Just <| row 9 0 "autoclippers" "AutoClippers" model.autoClipperCount
-        else Nothing,
-        if model.computationEnabled
-        then Just <| row 9 0 "paperclip" "Total processors" model.processors
-        else Nothing,
-        if model.computationEnabled
-        then Just <| row 9 0 "paperclip" "Total memory" model.memory
-        else Nothing,
-        if model.computationEnabled
-        then Just <| row 9 0 "paperclip" "Stored operations" <| model.milliOps // 1000
-        else Nothing
-      ]
-    ],
-    Just <| div [class Projects] (showProjects model)
-  ]
+    div [] [
+      node "style" [] [text cssString],
+      div [] [table [] <| catMaybes <| List.map toRow <| viewItems model],
+      div [class Projects] (showProjects model)
+    ]
 

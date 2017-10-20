@@ -73,7 +73,7 @@ projects model = [
     icon = "wirespool",
     priceTag = "750 ops",
     shortDesc = "Increases AutoClipper performance",
-    visible = model.autoClipperCount > 0,
+    visible = model.computationEnabled && model.autoClipperCount > 0 && model.autoclipperRate == 1000,
     enabled = model.milliOps >= 750000,
     effect = { model | milliOps = model.milliOps - 750000, autoClipperRate = 1250 }
   }, {
