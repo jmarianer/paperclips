@@ -32,7 +32,7 @@ projects model = [
     shortDesc = "",
     visible = cheatsOn,
     enabled = True,
-    effect = { model | totalManufactured = model.totalManufactured + 1000 }
+    effect = Model.createClips model 1000
   }, {
     title = "Make paperclip",
     icon = "paperclip",
@@ -70,15 +70,15 @@ projects model = [
     effect = { model | funds = model.funds - ((2 ^ model.marketingLevel) * 10000), marketingLevel = model.marketingLevel + 1 }
   }, {
     title = "Improved AutoClippers",
-    icon = "wirespool",
+    icon = "autoclippers",
     priceTag = "750 ops",
     shortDesc = "Increases AutoClipper performance",
-    visible = model.computationEnabled && model.autoClipperCount > 0 && model.autoclipperRate == 1000,
+    visible = model.computationEnabled && model.autoClipperCount > 0 && model.autoClipperRate == 1000,
     enabled = model.milliOps >= 750000,
     effect = { model | milliOps = model.milliOps - 750000, autoClipperRate = 1250 }
   }, {
     title = "Improved AutoClippers",
-    icon = "wirespool",
+    icon = "autoclippers",
     priceTag = "2500 ops",
     shortDesc = "Increases AutoClipper performance",
     visible = model.autoClipperRate == 1250,

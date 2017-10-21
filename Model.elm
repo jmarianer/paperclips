@@ -1,4 +1,6 @@
-module Model exposing (..)--(Model, initialModel, createClips, sellClips, demand)
+module Model exposing (Model, initialModel, createClips, sellClips, demand, autoClipperPrice, createPartialClips)
+
+import Fibonacci
 
 type alias Model = {
   unusedClips : Int,
@@ -14,6 +16,8 @@ type alias Model = {
   marketingLevel : Int,
   partialClips  : Int,
   computationEnabled : Bool,
+  trust : Int,
+  nextTrust : Fibonacci.Fib,
   processors : Int,
   memory : Int,
   milliOps : Int,
@@ -36,6 +40,8 @@ initialModel = {
   marketingLevel = 0,
   partialClips = 0,
   computationEnabled = False,
+  trust = 2,
+  nextTrust = (3000, 5000),
   processors = 1,
   memory = 1,
   milliOps = 0,
@@ -47,12 +53,16 @@ createClips : Model -> Int -> Model
 createClips m i =
   let
     clipCount = min i m.wireInches
+    newTotalManufactured = m.totalManufactured + clipCount
+    newTrust = (m.totalManufactured < Fibonacci.get m.nextTrust) && (newTotalManufactured >= Fibonacci.get m.nextTrust)
   in
     { m |
       unusedClips = m.unusedClips + clipCount,
-      totalManufactured = m.totalManufactured + clipCount,
+      totalManufactured = newTotalManufactured,
       wireInches = m.wireInches - clipCount,
-      computationEnabled = m.computationEnabled || m.totalManufactured + clipCount >= 2000
+      computationEnabled = m.computationEnabled || newTotalManufactured >= 2000,
+      trust = if newTrust then m.trust+1 else m.trust,
+      nextTrust = if newTrust then Fibonacci.advance m.nextTrust else m.nextTrust
     }
 
 createPartialClips : Model -> Int -> Model

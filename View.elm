@@ -113,12 +113,22 @@ viewItems model =
       trigger = model.autoClipperCount > 0,
       show = default model.autoClipperCount
     }, {
-      icon = "paperclip",
+      icon = "trust",
+      description = "Next available trust",
+      trigger = model.computationEnabled,
+      show = default <| Tuple.first model.nextTrust
+    }, {
+      icon = "trust",
+      description = "Current trust",
+      trigger = model.computationEnabled,
+      show = default model.trust
+    }, {
+      icon = "processor",
       description = "Total processors",
       trigger = model.computationEnabled,
       show = default model.processors
     }, {
-      icon = "paperclip",
+      icon = "memory",
       description = "Total memory",
       trigger = model.computationEnabled,
       show = default model.memory
