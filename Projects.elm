@@ -28,7 +28,7 @@ projects model = [
   }, {
     title = "Cheat paperclips",
     icon = "cheat",
-    priceTag = "1000 clips for free",
+    priceTag = "Create 1000 paperclips",
     shortDesc = "",
     visible = cheatsOn,
     enabled = True,
@@ -62,7 +62,7 @@ projects model = [
     effect = { model | funds = model.funds - Model.autoClipperPrice model, autoClipperCount = model.autoClipperCount + 1 }
   }, {
     title = "Buy ad",
-    icon = "wirespool",
+    icon = "ad",
     priceTag = "$" ++ (toString <| (2 ^ model.marketingLevel) * 100),
     shortDesc = "Increases marketing effectiveness",
     visible = True,
@@ -76,6 +76,22 @@ projects model = [
     visible = model.computationEnabled && model.autoClipperCount > 0 && model.autoClipperRate == 1000,
     enabled = model.milliOps >= 750000,
     effect = { model | milliOps = model.milliOps - 750000, autoClipperRate = 1250 }
+  }, {
+    title = "Processor",
+    icon = "processor",
+    priceTag = "1 Trust",
+    shortDesc = "Creates ops",
+    visible = model.computationEnabled,
+    enabled = model.trust > model.processors + model.memory,
+    effect = { model | processors = model.processors + 1 }
+  }, {
+    title = "Memory",
+    icon = "memory",
+    priceTag = "1 Trust",
+    shortDesc = "Stores ops",
+    visible = model.computationEnabled,
+    enabled = model.trust > model.processors + model.memory,
+    effect = { model | memory = model.memory + 1 }
   }, {
     title = "Improved AutoClippers",
     icon = "autoclippers",
