@@ -13,6 +13,10 @@ type alias Project = {
   effect : Model
   }
 
+fixedPoint : Int -> Int -> String
+fixedPoint num decimals =
+  toString (num // 10^decimals) ++ "." ++ (String.padLeft decimals '0' <| toString <| rem num (10^decimals))
+
 cheatsOn = True
 
 projects : Model -> List Project
@@ -52,11 +56,11 @@ projects model = [
   }, {
     title = "AutoClippers",
     icon = "autoclippers",
-    priceTag = toString <| Model.autoClipperPrice model,
+    priceTag = "$" ++ fixedPoint (Model.autoClipperPrice model) 2,
     shortDesc =
       if model.autoClipperRate == 1000
       then "Creates one paperclip per second"
-      else "Creates " ++ toString ((toFloat model.autoClipperRate) / 1000) ++ " paperclips per second",
+      else "Creates " ++ toString (fixedPoint model.autoClipperRate 3) ++ " paperclips per second",
     visible = model.autoClippersEnabled,
     enabled = model.funds >= Model.autoClipperPrice model,
     effect = { model | funds = model.funds - Model.autoClipperPrice model, autoClipperCount = model.autoClipperCount + 1 }
@@ -88,7 +92,7 @@ projects model = [
     title = "Memory",
     icon = "memory",
     priceTag = "1 Trust",
-    shortDesc = "Stores ops",
+    shortDesc = "Creates ops",
     visible = model.computationEnabled,
     enabled = model.trust > model.processors + model.memory,
     effect = { model | memory = model.memory + 1 }

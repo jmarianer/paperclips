@@ -74,7 +74,7 @@ showNumber digits decimals num =
       ++ [span [class Overlay] <| splitThousandsAndAddDecimal <| min num maxDisplay]
     )
 
-viewItems model =
+manufacturingItems model =
   let
     default num = showNumber 9 0 num
   in
@@ -112,7 +112,13 @@ viewItems model =
       description = "AutoClippers",
       trigger = model.autoClipperCount > 0,
       show = default model.autoClipperCount
-    }, {
+    }]
+    
+computationItems model =
+  let
+    default num = showNumber 9 0 num
+  in
+    [{
       icon = "trust",
       description = "Next available trust",
       trigger = model.computationEnabled,
@@ -126,7 +132,13 @@ viewItems model =
       icon = "processor",
       description = "Total processors",
       trigger = model.computationEnabled,
-      show = default model.processors
+      show = div [class Thing] [
+        showNumber 3 0 model.processors,
+        div [class Spacer] [],
+        icon "memory" "Total memory",
+        showNumber 3 0 model.memory
+      ]
+      --show = default model.processors
     }, {
       icon = "memory",
       description = "Total memory",
@@ -149,10 +161,19 @@ view model =
         td [] [viewItem.show]
       ]
       else Nothing
+
+    showTable header items =
+      let
+        rows = catMaybes <| List.map toRow <| items model
+      in
+        if rows == []
+        then []
+        else [h1 [] [text header], table [] rows]
   in
     div [] [
       node "style" [] [text cssString],
-      div [] [table [] <| catMaybes <| List.map toRow <| viewItems model],
+      div [class TableHolder] <| showTable "Manufacturing" manufacturingItems,
+      div [class TableHolder] <| showTable "Computation" computationItems,
       div [class Projects] (showProjects model)
     ]
 

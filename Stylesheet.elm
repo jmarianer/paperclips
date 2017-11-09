@@ -1,19 +1,20 @@
 module Stylesheet exposing (CssClasses(..), cssString)
 
 import Css exposing (..)
-import Css.Elements exposing (..)
+import Css.Elements exposing (img, body, div, h1)
 
-type CssClasses = Number | Overlay | Projects | Project | Comma | Button | Disabled | Thing
+type CssClasses = Number | Overlay | Projects | Project | Comma | Button | Disabled | Thing | TableHolder | Spacer
 css =
   stylesheet [
     body [
       backgroundColor <| hex "AF7B35",
-      margin (px 10)
+      margin zero
     ],
     img [
-      width (pt 36),
-      height (pt 36),
-      margin (px 5)
+      width (em 1),
+      height (em 1),
+      margin (px 5),
+      marginRight (px 15)
     ],
     class Thing [
       displayFlex,
@@ -21,7 +22,7 @@ css =
       justifyContent center
     ],
     Css.Elements.table [
-      borderSpacing (px 15)
+      borderSpacing (em 0.3)
     ],
     class Number [
       fontFamilies [qt "DSEG7 Classic Mini"],
@@ -30,7 +31,6 @@ css =
       backgroundColor <| hex "000",
       border3 (px 1) inset <| hex "979797",
       padding (px 5),
-      fontSize (pt 36),
       textAlign right,
       children [
         class Overlay [
@@ -43,8 +43,8 @@ css =
     ],
     class Comma [
       fontFamilies [qt "DSEG14 Classic Mini"],
-      marginRight (px -20),
-      marginLeft (px -10)
+      marginRight (em -0.3),
+      marginLeft (em -0.25)
     ],
     class Project [
       width (px 128),
@@ -53,15 +53,31 @@ css =
       flexDirection column,
       justifyContent (\a -> property "space-evenly" a.value),
       alignItems center,
-      margin (px 15)
+      margin (px 15),
+      children [
+        img [
+          width (pt 36),
+          height (pt 36)
+        ]
+      ]
     ],
     class Projects [
       displayFlex,
-      flexDirection row
+      flexDirection row,
+      flexWrap wrap,
+      property "align-content" "start"
     ],
     div [
       displayFlex,
       flexDirection row
+    ],
+    class TableHolder [
+      fontSize (pt 28),
+      borderRight3 (px 1.5) solid (hex "000"),
+      flexDirection column
+    ],
+    class Spacer [
+      flexGrow <| int 100
     ],
     class Button [
       border3 (px 1) outset <| hex "979797",
@@ -75,6 +91,11 @@ css =
         border3 (px 1) outset <| hex "979797"
       ],
       color <| hex "#4c4c4c"
+    ],
+    h1 [
+      fontSize (em 1),
+      fontFamily monospace,
+      textAlign center
     ]
   ]
 
