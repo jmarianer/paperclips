@@ -11,7 +11,7 @@ import Html.Events exposing (onClick)
 
 -- TODO move these elsewhere
 import Time exposing (Time)
-type CssClasses = Number | Overlay | Projects | Project | Comma | Button | Disabled | Thing | TableHolder | Spacer
+type CssClasses = Number | Overlay | Projects | Project | Comma | Button | Disabled | CenterAll | TableHolder | Spacer | MainDiv
 
 type Msg = RunProject Project | LargeTick Time | MediumTick Time | SmallTick Time | IncreasePrice Int | MaybeSell Int
 
@@ -103,7 +103,7 @@ manufacturingItems model =
       icon = "paperclip",
       description = "Price per clip",
       trigger = True,
-      show = div [class Thing] [
+      show = div [class CenterAll] [
         iconButton "minus" "Decrease price" <| IncreasePrice -1,
         showNumber 3 2 model.priceCents,
         iconButton "plus" "Increase price" <| IncreasePrice 1
@@ -133,7 +133,7 @@ computationItems model =
       icon = "processor",
       description = "Total processors",
       trigger = model.computationEnabled,
-      show = div [class Thing] [
+      show = div [class CenterAll] [
         showNumber 3 0 model.processors,
         div [class Spacer] [],
         icon "memory" "Total memory",
@@ -171,7 +171,7 @@ view model =
         then []
         else [h1 [] [text header], table [] rows]
   in
-    div [] [
+    div [class MainDiv] [
       div [class TableHolder] <| showTable "Manufacturing" manufacturingItems,
       div [class TableHolder] <| showTable "Computation" computationItems,
       div [class Projects] (showProjects model)
