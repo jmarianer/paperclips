@@ -27,7 +27,7 @@ maybeShowProject model project =
   in
     case project.visible of
       True ->
-        Just <| div [classes <| [Project, Button] ++ maybeDisabled, onClick <| RunProject project] [
+        Just <| div [classes <| [Project] ++ maybeDisabled, onClick <| RunProject project] [
           icon project.icon "",
           text project.title,
           br [] [],
@@ -68,92 +68,98 @@ showNumber digits decimals num =
         ++ [text ("." ++ (String.padLeft decimals '0' <| toString <| rem i <| 10^decimals))]
       else
         splitThousands i
-    
+
   in
     div [class Number] (
       splitThousandsAndAddDecimal eights
       ++ [span [class Overlay] <| splitThousandsAndAddDecimal <| min num maxDisplay]
     )
 
-manufacturingItems model =
-  let
-    default num = showNumber 9 0 num
-  in
-    [{
-      icon = "paperclip",
-      description = "Inventory",
-      trigger = True,
-      show = default model.unusedClips
-    }, {
-      icon = "profit-graph",
-      description = "Total manufactured paperclips",
-      trigger = True,
-      show = default model.totalManufactured
-    }, {
-      icon = "wirespool",
-      description = "Available wire",
-      trigger = True,
-      show = default model.wireInches
-    }, {
-      icon = "dollar",
-      description = "Available funds",
-      trigger = True,
-      show = showNumber 9 2 model.funds
-    }, {
-      icon = "paperclip",
-      description = "Price per clip",
-      trigger = True,
-      show = div [class CenterAll] [
-        iconButton "minus" "Decrease price" <| IncreasePrice -1,
-        showNumber 3 2 model.priceCents,
-        iconButton "plus" "Increase price" <| IncreasePrice 1
-      ]
-    }, {
-      icon = "autoclippers",
-      description = "AutoClippers",
-      trigger = model.autoClipperCount > 0,
-      show = default model.autoClipperCount
-    }]
-    
-computationItems model =
-  let
-    default num = showNumber 9 0 num
-  in
-    [{
-      icon = "trust",
-      description = "Next available trust",
-      trigger = model.computationEnabled,
-      show = default <| Tuple.first model.nextTrust
-    }, {
-      icon = "trust",
-      description = "Current trust",
-      trigger = model.computationEnabled,
-      show = default model.trust
-    }, {
-      icon = "processor",
-      description = "Total processors",
-      trigger = model.computationEnabled,
-      show = div [class CenterAll] [
-        showNumber 3 0 model.processors,
-        div [class Spacer] [],
-        icon "memory" "Total memory",
-        showNumber 3 0 model.memory
-      ]
-      --show = default model.processors
-    }, {
-      icon = "memory",
-      description = "Total memory",
-      trigger = model.computationEnabled,
-      show = default model.memory
-    }, {
-      icon = "paperclip",
-      description = "Stored operations",
-      trigger = model.computationEnabled,
-      show = default <| model.milliOps // 1000
-    }]
+showDefaultNumber : Int -> Html Msg
+showDefaultNumber = showNumber 9 0
 
-view : Model -> Html Msg
-view model =
+type alias RowDescriptor =
+  {
+    icon: String,
+    description: String,
+    trigger: Bool,
+    show: Html Msg
+  }
+
+manufacturingItems : Model -> List RowDescriptor
+manufacturingItems model =
+  [{
+    icon = "paperclip",
+    description = "Inventory",
+    trigger = True,
+    show = showDefaultNumber model.unusedClips
+  }, {
+    icon = "profit-graph",
+    description = "Total manufactured paperclips",
+    trigger = True,
+    show = showDefaultNumber model.totalManufactured
+  }, {
+    icon = "wirespool",
+    description = "Available wire",
+    trigger = True,
+    show = showDefaultNumber model.wireInches
+  }, {
+    icon = "dollar",
+    description = "Available funds",
+    trigger = True,
+    show = showNumber 9 2 model.funds
+  }, {
+    icon = "paperclip",
+    description = "Price per clip",
+    trigger = True,
+    show = div [class CenterAll] [
+      iconButton "minus" "Decrease price" <| IncreasePrice -1,
+      showNumber 3 2 model.priceCents,
+      iconButton "plus" "Increase price" <| IncreasePrice 1
+    ]
+  }, {
+    icon = "autoclippers",
+    description = "AutoClippers",
+    trigger = model.autoClipperCount > 0,
+    show = showDefaultNumber model.autoClipperCount
+  }]
+
+computationItems : Model -> List RowDescriptor
+computationItems model =
+  [{
+    icon = "trust",
+    description = "Next available trust",
+    trigger = model.computationEnabled,
+    show = showDefaultNumber <| Tuple.first model.nextTrust
+  }, {
+    icon = "trust",
+    description = "Current trust",
+    trigger = model.computationEnabled,
+    show = showDefaultNumber model.trust
+  }, {
+    icon = "processor",
+    description = "Total processors",
+    trigger = model.computationEnabled,
+    show = div [class CenterAll] [
+      showNumber 3 0 model.processors,
+      div [class Spacer] [],
+      icon "memory" "Total memory",
+      showNumber 3 0 model.memory
+    ]
+  }, {
+    icon = "memory",
+    description = "Total memory",
+    trigger = model.computationEnabled,
+    show = showDefaultNumber model.memory
+  }, {
+    icon = "paperclip",
+    description = "Stored operations",
+    trigger = model.computationEnabled,
+    show = showDefaultNumber <| model.milliOps // 1000
+  }]
+
+showTable : String -> List RowDescriptor -> Maybe (Html Msg)
+showTable header items =
   let
     toRow viewItem =
       if viewItem.trigger
@@ -163,17 +169,20 @@ view model =
       ]
       else Nothing
 
-    showTable header items =
-      let
-        rows = catMaybes <| List.map toRow <| items model
-      in
-        if rows == []
-        then []
-        else [h1 [] [text header], table [] rows]
+    rows = catMaybes <| List.map toRow <| items
   in
-    div [class MainDiv] [
-      div [class TableHolder] <| showTable "Manufacturing" manufacturingItems,
-      div [class TableHolder] <| showTable "Computation" computationItems,
-      div [class Projects] (showProjects model)
+    if rows == []
+    then Nothing
+    else Just <| div [class TableHolder] [h1 [] [text header], table [] rows]
+
+view : Model -> Html Msg
+view model =
+  let
+    tables = [
+      showTable "Manufacturing" <| manufacturingItems model,
+      showTable "Computation" <| computationItems model,
+      Just <| div [class Projects] (showProjects model)
     ]
+  in
+    div [class MainDiv] <| catMaybes tables
 
