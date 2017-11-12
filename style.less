@@ -1,6 +1,8 @@
 body {
   background-color: #d8a45f;
   margin: 0px;
+  display: flex;
+  flex-direction: column;
 }
 
 img {
@@ -10,9 +12,14 @@ img {
   margin-right: 15px;
 }
 
-.MainDiv {
+#elm {
   display: flex;
-  flex-direction: row;
+  flex: 1 1 0;
+
+  .MainDiv {
+    display: flex;
+    flex-direction: row;
+  }
 }
 
 .Button {
@@ -101,6 +108,7 @@ img {
   }
 }
 
-
-
-
+.footer {
+  font-size: 10px;
+  text-align: center;
+}
