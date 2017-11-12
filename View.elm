@@ -8,10 +8,11 @@ import Html exposing (..)
 import Html.Attributes exposing (alt, colspan, disabled, src, title)
 import Html.CssHelpers
 import Html.Events exposing (onClick)
-import Stylesheet exposing (..)
 
 -- TODO move these elsewhere
 import Time exposing (Time)
+type CssClasses = Number | Overlay | Projects | Project | Comma | Button | Disabled | Thing | TableHolder | Spacer
+
 type Msg = RunProject Project | LargeTick Time | MediumTick Time | SmallTick Time | IncreasePrice Int | MaybeSell Int
 
 classes = .class <| Html.CssHelpers.withNamespace ""
@@ -26,7 +27,7 @@ maybeShowProject model project =
   in
     case project.visible of
       True ->
-        Just <| div [classes <| [Stylesheet.Project, Stylesheet.Button] ++ maybeDisabled, onClick <| RunProject project] [
+        Just <| div [classes <| [Project, Button] ++ maybeDisabled, onClick <| RunProject project] [
           icon project.icon "",
           text project.title,
           br [] [],
@@ -171,7 +172,6 @@ view model =
         else [h1 [] [text header], table [] rows]
   in
     div [] [
-      node "style" [] [text cssString],
       div [class TableHolder] <| showTable "Manufacturing" manufacturingItems,
       div [class TableHolder] <| showTable "Computation" computationItems,
       div [class Projects] (showProjects model)
