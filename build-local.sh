@@ -4,7 +4,7 @@
 set -e
 mkdir -p out
 lessc style.less > out/style.css
-cp index.html out
+cp *.html out
 cp -R icons out
 cp -R fonts out
 elm make Main.elm --output out/paperclips.js
